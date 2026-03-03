@@ -1,0 +1,10 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/PAI/assets/:path*", "destination": "/assets/:path*" },
+    { "source": "/PAI/logo.png",      "destination": "/logo.png" },
+    { "source": "/PAI",               "destination": "/index.html" },
+    { "source": "/PAI/:path*",        "destination": "/index.html" }
+  ]
+}

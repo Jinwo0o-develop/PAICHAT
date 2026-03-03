@@ -1,8 +1,6 @@
 import type { ChatMessage, GeminiModel } from '../../types/ai.ts';
 import type { AIServiceStrategy } from './types.ts';
 
-const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-
 // ─── 내부 변환 타입 ────────────────────────────────────────────────────────────
 
 type GeminiPart =
@@ -59,15 +57,14 @@ function toGeminiRequest(messages: ChatMessage[]): GeminiRequest {
 
 /**
  * Gemini AI 서비스 구현 (Strategy 패턴).
- * 모델을 내부 상태로 보유하며, setModel()로 런타임 전환 가능.
+ * API 키는 서버(Vercel Edge Function)에서만 처리되며,
+ * 클라이언트는 /api/gemini/* 프록시를 통해서만 통신합니다.
  */
 export class GeminiService implements AIServiceStrategy {
   private static instance: GeminiService;
-  private readonly apiKey: string;
   private model: GeminiModel;
 
   private constructor(model: GeminiModel = 'gemini-2.5-flash') {
-    this.apiKey = import.meta.env.VITE_GEMINI_API_KEY as string;
     this.model = model;
   }
 
@@ -88,15 +85,16 @@ export class GeminiService implements AIServiceStrategy {
   }
 
   async complete(messages: ChatMessage[]): Promise<string> {
-    const url = `${GEMINI_BASE}/${this.model}:generateContent?key=${this.apiKey}`;
-    const response = await fetch(url, {
+    const response = await fetch('/api/gemini/complete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(toGeminiRequest(messages)),
+      body: JSON.stringify({ model: this.model, request: toGeminiRequest(messages) }),
     });
+
     if (!response.ok) {
-      throw new Error(`Gemini API 오류 (${response.status})`);
+      throw new Error(`Gemini 프록시 오류 (${response.status})`);
     }
+
     const json = (await response.json()) as {
       candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
     };
@@ -117,17 +115,16 @@ export class GeminiService implements AIServiceStrategy {
       onDone();
     });
 
-    const url = `${GEMINI_BASE}/${this.model}:streamGenerateContent?alt=sse&key=${this.apiKey}`;
-    fetch(url, {
+    fetch('/api/gemini/stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
-      body: JSON.stringify(toGeminiRequest(messages)),
+      body: JSON.stringify({ model: this.model, request: toGeminiRequest(messages) }),
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error(
-            `Gemini API 오류 (${response.status}): API 키 또는 모델명을 확인하세요.`,
+            `Gemini 프록시 오류 (${response.status}): API 키 또는 모델명을 확인하세요.`,
           );
         }
         const reader = response.body?.getReader();
