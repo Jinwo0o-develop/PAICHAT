@@ -5,6 +5,7 @@ import { useChat } from '../../hooks/useChat.ts';
 import type { Prompt } from '../../types/prompt.ts';
 import { LOGO_URL } from '../../constants/initialData.ts';
 import PromptCreateModal from '../prompt/PromptCreateModal.tsx';
+import PromptWizardModal from '../prompt/PromptWizardModal.tsx';
 
 // ─── 단일 프롬프트 아이템 ─────────────────────────────────────────────────────
 
@@ -67,6 +68,7 @@ export default function PromptSection() {
   const { selectPrompt, selectPromptsList } = useChat();
 
   const [showCreate, setShowCreate] = useState(false);
+  const [showWizard, setShowWizard] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState<Prompt | null>(null);
 
   return (
@@ -136,6 +138,14 @@ export default function PromptSection() {
       {showCreate && (
         <PromptCreateModal
           onClose={() => setShowCreate(false)}
+          onCreate={createPrompt}
+          onOpenWizard={() => setShowWizard(true)}
+        />
+      )}
+
+      {showWizard && (
+        <PromptWizardModal
+          onClose={() => setShowWizard(false)}
           onCreate={createPrompt}
         />
       )}

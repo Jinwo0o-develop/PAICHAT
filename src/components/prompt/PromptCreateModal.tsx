@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Save, Lightbulb } from 'lucide-react';
+import { X, Save, Lightbulb, Sparkles } from 'lucide-react';
 
 interface Props {
   onClose: () => void;
   onCreate?: (name: string, description: string, content: string) => void;
   onUpdate?: (name: string, description: string, content: string) => void;
   initialData?: { name: string; description: string; content: string };
+  onOpenWizard?: () => void;
 }
 
-export default function PromptCreateModal({ onClose, onCreate, onUpdate, initialData }: Props) {
+export default function PromptCreateModal({ onClose, onCreate, onUpdate, initialData, onOpenWizard }: Props) {
   const isEditMode = !!initialData;
   const [name, setName] = useState(initialData?.name ?? '');
   const [description, setDescription] = useState(initialData?.description ?? '');
@@ -95,7 +96,21 @@ export default function PromptCreateModal({ onClose, onCreate, onUpdate, initial
         </div>
 
         {/* 버튼 */}
-        <div className="flex justify-end gap-2 px-6 pb-5">
+        <div className="flex items-center justify-between px-6 pb-5">
+          {/* 쉽게 만들기 (수정 모드에선 숨김) */}
+          {!isEditMode && onOpenWizard ? (
+            <button
+              onClick={() => { onClose(); onOpenWizard(); }}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-xl transition-all hover:opacity-90"
+              style={{ background: 'linear-gradient(135deg, #44ccfd22, #6366f122)', color: '#6366f1' }}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              AI로 쉽게 만들기
+            </button>
+          ) : (
+            <span />
+          )}
+          <div className="flex gap-2">
           <button
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors"
@@ -110,6 +125,7 @@ export default function PromptCreateModal({ onClose, onCreate, onUpdate, initial
             <Save className="w-3.5 h-3.5" />
             저장
           </button>
+          </div>
         </div>
       </div>
     </div>,

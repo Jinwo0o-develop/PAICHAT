@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Pencil, Check, X } from 'lucide-react';
+import { ArrowLeft, Pencil, Check, X } from 'lucide-react';
 import type { Conversation } from '../../types/index.ts';
 import { useChat } from '../../hooks/useChat.ts';
 
@@ -9,7 +9,7 @@ interface Props {
 
 /** 채팅 화면 상단: 대화 제목 (클릭하여 수정 가능) */
 export default function ChatHeader({ conversation }: Props) {
-  const { renameConversation } = useChat();
+  const { renameConversation, newChat } = useChat();
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(conversation.title);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -39,7 +39,16 @@ export default function ChatHeader({ conversation }: Props) {
   };
 
   return (
-    <header className="absolute top-0 left-0 right-0 h-20 px-8 flex items-center z-10 bg-gradient-to-b from-background-light to-transparent dark:from-background-dark">
+    <header className="absolute top-0 left-0 right-0 h-20 px-4 flex items-center gap-2 z-10 bg-gradient-to-b from-background-light to-transparent dark:from-background-dark">
+      {/* 홈으로 */}
+      <button
+        onClick={newChat}
+        aria-label="홈 화면으로"
+        title="홈 화면으로"
+        className="shrink-0 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </button>
       <div className="flex items-center gap-3 min-w-0">
         {isEditing ? (
           /* 수정 모드 */

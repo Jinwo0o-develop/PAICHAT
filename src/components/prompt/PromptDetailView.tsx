@@ -1,3 +1,4 @@
+import { ArrowLeft } from 'lucide-react';
 import { useChat } from '../../hooks/useChat.ts';
 import { usePrompts } from '../../hooks/usePrompts.ts';
 import ChatInput from '../common/ChatInput.tsx';
@@ -12,6 +13,7 @@ export default function PromptDetailView() {
     isStreaming,
     startChat,
     selectConversation,
+    newChat,
   } = useChat();
   const { prompts, markUsed } = usePrompts();
 
@@ -31,7 +33,16 @@ export default function PromptDetailView() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-background-light dark:bg-background-dark overflow-hidden">
+    <div className="flex-1 flex flex-col bg-background-light dark:bg-background-dark overflow-hidden relative">
+      {/* 홈으로 */}
+      <button
+        onClick={newChat}
+        aria-label="홈 화면으로"
+        title="홈 화면으로"
+        className="absolute top-4 left-4 z-10 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </button>
       <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden relative">
         {/* 장식용 블롭 */}
         <div className="absolute top-1/4 -left-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10 pointer-events-none" />

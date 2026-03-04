@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, MoreHorizontal, Sparkles } from 'lucide-react';
 import { usePrompts } from '../../hooks/usePrompts.ts';
 import { useChat } from '../../hooks/useChat.ts';
 import type { Prompt } from '../../types/prompt.ts';
 import PromptCreateModal from './PromptCreateModal.tsx';
+import PromptWizardModal from './PromptWizardModal.tsx';
 
 // ─── 아바타 색상 (이름 기반 결정론적 색상) ─────────────────────────────────────
 
@@ -126,9 +127,10 @@ function PromptRow({ prompt, onClick, onEdit, onDelete }: PromptRowProps) {
 /** Gemini Gem 관리자 스타일의 프롬프트 전체 목록 페이지 */
 export default function PromptsManagerView() {
   const { prompts, createPrompt, deletePrompt, updatePrompt } = usePrompts();
-  const { selectPrompt } = useChat();
+  const { selectPrompt, newChat } = useChat();
 
   const [showCreate, setShowCreate] = useState(false);
+  const [showWizard, setShowWizard] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState<Prompt | null>(null);
   const [search, setSearch] = useState('');
 
@@ -152,6 +154,14 @@ export default function PromptsManagerView() {
 
           {/* 페이지 헤더 */}
           <div className="mb-8">
+            <button
+              onClick={newChat}
+              aria-label="홈 화면으로"
+              title="홈 화면으로"
+              className="mb-4 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all inline-flex"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
               프롬프트 관리자
             </h1>
@@ -173,14 +183,24 @@ export default function PromptsManagerView() {
                 </span>
               </div>
 
-              <button
-                onClick={() => setShowCreate(true)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95 shadow-sm"
-                style={{ backgroundColor: '#44ccfd' }}
-              >
-                <Plus className="w-4 h-4" />
-                새 프롬프트
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowWizard(true)}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95 shadow-sm"
+                  style={{ background: 'linear-gradient(135deg, #44ccfd, #6366f1)' }}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  쉽게 만들기
+                </button>
+                <button
+                  onClick={() => setShowCreate(true)}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95 shadow-sm"
+                  style={{ backgroundColor: '#44ccfd' }}
+                >
+                  <Plus className="w-4 h-4" />
+                  직접 만들기
+                </button>
+              </div>
             </div>
 
             {/* 검색 (프롬프트 3개 이상일 때만 표시) */}
@@ -259,6 +279,14 @@ export default function PromptsManagerView() {
       {showCreate && (
         <PromptCreateModal
           onClose={() => setShowCreate(false)}
+          onCreate={createPrompt}
+          onOpenWizard={() => { setShowCreate(false); setShowWizard(true); }}
+        />
+      )}
+
+      {showWizard && (
+        <PromptWizardModal
+          onClose={() => setShowWizard(false)}
           onCreate={createPrompt}
         />
       )}

@@ -23,6 +23,7 @@ interface Props {
   onRenameCommit: (id: string) => void;
   onRenameKeyDown: (e: KeyboardEvent<HTMLInputElement>, id: string) => void;
   onMenuOpen: (e: MouseEvent<HTMLButtonElement>, id: string) => void;
+  onOpenNewWindow?: (id: string) => void;
 }
 
 /** 사이드바의 단일 대화 항목 */
@@ -38,12 +39,19 @@ export default function ConversationItem({
   onRenameCommit,
   onRenameKeyDown,
   onMenuOpen,
+  onOpenNewWindow,
 }: Props) {
   const Icon = ICON_MAP[conv.iconType] ?? MessageSquare;
 
   return (
     <div
       onClick={() => !isRenaming && onSelect(conv.id)}
+      onAuxClick={(e: MouseEvent<HTMLDivElement>) => {
+        if (e.button === 1 && !isRenaming) {
+          e.preventDefault();
+          onOpenNewWindow?.(conv.id);
+        }
+      }}
       className={cn(
         'group relative flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all',
         isActive

@@ -229,6 +229,12 @@ export default function ConversationList({ conversations, activeId }: Props) {
     }
   }, [periodConfirm, deleteConversationsBefore]);
 
+  const openInNewWindow = useCallback((id: string) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('conv', id);
+    window.open(url.toString(), '_blank');
+  }, []);
+
   const pinnedList = conversations.filter((c) => c.pinned);
   const unpinnedList = conversations.filter((c) => !c.pinned);
 
@@ -254,6 +260,7 @@ export default function ConversationList({ conversations, activeId }: Props) {
         onRenameCommit={commitRename}
         onRenameKeyDown={handleRenameKeyDown}
         onMenuOpen={openMenu}
+        onOpenNewWindow={openInNewWindow}
       />
     </Fragment>
   );

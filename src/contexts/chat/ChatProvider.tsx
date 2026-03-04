@@ -46,8 +46,11 @@ const storage = StorageService.getInstance();
 
 function buildInitialState(): AppState {
   const conversations = storage.loadConversations(INITIAL_CONVERSATIONS);
+  // 새 창에서 열기: ?conv=ID 파라미터 우선 적용
+  const urlConvId = new URLSearchParams(window.location.search).get('conv');
   const savedId = storage.loadActiveId();
-  const activeId = savedId && conversations.find((c) => c.id === savedId) ? savedId : null;
+  const resolvedId = urlConvId ?? savedId;
+  const activeId = resolvedId && conversations.find((c) => c.id === resolvedId) ? resolvedId : null;
   const view: AppView = activeId ? 'chat' : 'welcome';
   const { provider: aiProvider, geminiModel } = storage.loadAISettings();
   const { provider: etiquetteProvider, geminiModel: etiquetteGeminiModel } =
